@@ -1,0 +1,17 @@
+ldap:
+  host: "ldap.example.com"
+  port: 636
+  use_tls: true
+  skip_verify: false  # Set to true to skip TLS certificate verification
+  bind_dn: "cn=readonly,dc=example,dc=com"
+  bind_password: "secret"  # Or use env var LDAP_BIND_PASSWORD
+  base_dn: "dc=example,dc=com"
+  user_filter: "(objectClass=posixAccount)"
+  group_filter: "(objectClass=posixGroup)"
+  shadow_filter: "(objectClass=shadowAccount)"
+
+cache:
+  ttl: 300  # seconds (5 minutes)
+
+server:
+  listen: ":8080"
