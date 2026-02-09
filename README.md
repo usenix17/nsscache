@@ -1,10 +1,10 @@
 # nsscache-http
 
-An HTTP server that exposes LDAP user, group, and shadow data for use with [nsscache](https://github.com/google/nsscache). It periodically fetches data from an LDAP directory (e.g., FreeIPA) and serves it over HTTP in formats compatible with nsscache's HTTP source.
+An HTTP server that exposes LDAP user and group data for use with [nsscache](https://github.com/google/nsscache). It periodically fetches data from an LDAP directory (e.g., FreeIPA) and serves it over HTTP in formats compatible with nsscache's HTTP source.
 
 ## Features
 
-- Queries LDAP for passwd, group, and shadow entries
+- Queries LDAP for passwd and group entries
 - In-memory caching with configurable TTL
 - Serves data in both flat file format (for nsscache) and JSON
 - Health endpoint with cache statistics
@@ -18,8 +18,6 @@ An HTTP server that exposes LDAP user, group, and shadow data for use with [nssc
 | `/passwd.json` | application/json | Users as JSON array |
 | `/group` | text/plain | Groups in group file format |
 | `/group.json` | application/json | Groups as JSON array |
-| `/shadow` | text/plain | Shadow entries in shadow file format |
-| `/shadow.json` | application/json | Shadow entries as JSON array |
 | `/health` | application/json | Cache health and statistics |
 
 ## Installation
@@ -52,7 +50,6 @@ ldap:
   base_dn: "dc=example,dc=com"
   user_filter: "(objectClass=posixAccount)"
   group_filter: "(objectClass=posixGroup)"
-  shadow_filter: "(objectClass=shadowAccount)"
 
 cache:
   ttl: 300  # seconds
