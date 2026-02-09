@@ -42,8 +42,6 @@ func main() {
 	http.HandleFunc("/passwd", h.PasswdFlat)
 	http.HandleFunc("/group.json", h.GroupJSON)
 	http.HandleFunc("/group", h.GroupFlat)
-	http.HandleFunc("/shadow.json", h.ShadowJSON)
-	http.HandleFunc("/shadow", h.ShadowFlat)
 	http.HandleFunc("/health", h.Health)
 
 	// Handle shutdown

@@ -55,43 +55,23 @@ func (h *Handler) GroupFlat(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(sb.String()))
 }
 
-// ShadowJSON returns shadow entries as JSON
-func (h *Handler) ShadowJSON(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(h.cache.GetShadows())
-}
-
-// ShadowFlat returns shadow entries in shadow file format
-func (h *Handler) ShadowFlat(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain")
-	shadows := h.cache.GetShadows()
-	var sb strings.Builder
-	for _, s := range shadows {
-		sb.WriteString(s.ToShadowLine())
-		sb.WriteByte('\n')
-	}
-	w.Write([]byte(sb.String()))
-}
-
 // HealthResponse represents the health check response
 type HealthResponse struct {
 	Status    string    `json:"status"`
 	Users     int       `json:"users"`
 	Groups    int       `json:"groups"`
-	Shadows   int       `json:"shadows"`
 	LastFetch time.Time `json:"last_fetch"`
 	CacheAge  string    `json:"cache_age"`
 }
 
 // Health returns cache health status
 func (h *Handler) Health(w http.ResponseWriter, r *http.Request) {
-	users, groups, shadows, lastFetch := h.cache.Stats()
+	users, groups, lastFetch := h.cache.Stats()
 
 	resp := HealthResponse{
 		Status:    "ok",
 		Users:     users,
 		Groups:    groups,
-		Shadows:   shadows,
 		LastFetch: lastFetch,
 		CacheAge:  time.Since(lastFetch).Round(time.Second).String(),
 	}

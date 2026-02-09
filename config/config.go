@@ -24,7 +24,6 @@ type LDAPConfig struct {
 	BaseDN       string `yaml:"base_dn"`
 	UserFilter   string `yaml:"user_filter"`
 	GroupFilter  string `yaml:"group_filter"`
-	ShadowFilter string `yaml:"shadow_filter"`
 }
 
 // CacheConfig contains cache settings
@@ -51,7 +50,6 @@ func Load(path string) (*Config, error) {
 			UseTLS:       true,
 			UserFilter:   "(objectClass=posixAccount)",
 			GroupFilter:  "(objectClass=posixGroup)",
-			ShadowFilter: "(objectClass=shadowAccount)",
 		},
 		Cache: CacheConfig{
 			TTL: 300,

@@ -8,7 +8,6 @@ ldap:
   base_dn: "dc=example,dc=com"
   user_filter: "(objectClass=posixAccount)"
   group_filter: "(objectClass=posixGroup)"
-  shadow_filter: "(objectClass=shadowAccount)"
 
 cache:
   ttl: 300  # seconds (5 minutes)

@@ -11,10 +11,9 @@ import (
 
 // Cache holds the in-memory cache of LDAP data
 type Cache struct {
-	mu      sync.RWMutex
-	users   []models.User
-	groups  []models.Group
-	shadows []models.Shadow
+	mu     sync.RWMutex
+	users  []models.User
+	groups []models.Group
 
 	client    *ldap.Client
 	ttl       time.Duration
@@ -88,20 +87,14 @@ func (c *Cache) Refresh() error {
 		return err
 	}
 
-	shadows, err := c.client.FetchShadow()
-	if err != nil {
-		return err
-	}
-
 	c.mu.Lock()
 	c.users = users
 	c.groups = groups
-	c.shadows = shadows
 	c.lastFetch = time.Now()
 	c.mu.Unlock()
 
-	log.Printf("cache refreshed: %d users, %d groups, %d shadow entries",
-		len(users), len(groups), len(shadows))
+	log.Printf("cache refreshed: %d users, %d groups",
+		len(users), len(groups))
 
 	return nil
 }
@@ -120,13 +113,6 @@ func (c *Cache) GetGroups() []models.Group {
 	return c.groups
 }
 
-// GetShadows returns the cached shadow entries
-func (c *Cache) GetShadows() []models.Shadow {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	return c.shadows
-}
-
 // LastFetch returns the time of the last successful fetch
 func (c *Cache) LastFetch() time.Time {
 	c.mu.RLock()
@@ -135,8 +121,8 @@ func (c *Cache) LastFetch() time.Time {
 }
 
 // Stats returns cache statistics
-func (c *Cache) Stats() (users, groups, shadows int, lastFetch time.Time) {
+func (c *Cache) Stats() (users, groups int, lastFetch time.Time) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	return len(c.users), len(c.groups), len(c.shadows), c.lastFetch
+	return len(c.users), len(c.groups), c.lastFetch
 }
