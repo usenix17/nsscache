@@ -3,6 +3,7 @@ package ldap
 import (
 	"crypto/tls"
 	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/go-ldap/ldap/v3"
@@ -80,8 +81,18 @@ func (c *Client) FetchUsers() ([]models.User, error) {
 
 	users := make([]models.User, 0, len(result.Entries))
 	for _, entry := range result.Entries {
-		uid, _ := strconv.Atoi(entry.GetAttributeValue("uidNumber"))
-		gid, _ := strconv.Atoi(entry.GetAttributeValue("gidNumber"))
+		name := entry.GetAttributeValue("uid")
+
+		uid, err := strconv.Atoi(entry.GetAttributeValue("uidNumber"))
+		if err != nil || uid == 0 {
+			log.Printf("skipping user %q: invalid or zero uidNumber", name)
+			continue
+		}
+		gid, err := strconv.Atoi(entry.GetAttributeValue("gidNumber"))
+		if err != nil || gid == 0 {
+			log.Printf("skipping user %q: invalid or zero gidNumber", name)
+			continue
+		}
 
 		// Use gecos if available, fall back to cn
 		gecos := entry.GetAttributeValue("gecos")
@@ -90,7 +101,7 @@ func (c *Client) FetchUsers() ([]models.User, error) {
 		}
 
 		users = append(users, models.User{
-			Name:   entry.GetAttributeValue("uid"),
+			Name:   name,
 			Passwd: "x",
 			UID:    uid,
 			GID:    gid,
@@ -120,7 +131,13 @@ func (c *Client) FetchGroups() ([]models.Group, error) {
 
 	groups := make([]models.Group, 0, len(result.Entries))
 	for _, entry := range result.Entries {
-		gid, _ := strconv.Atoi(entry.GetAttributeValue("gidNumber"))
+		name := entry.GetAttributeValue("cn")
+
+		gid, err := strconv.Atoi(entry.GetAttributeValue("gidNumber"))
+		if err != nil || gid == 0 {
+			log.Printf("skipping group %q: invalid or zero gidNumber", name)
+			continue
+		}
 
 		// Collect members from both memberUid (traditional POSIX) and member (FreeIPA/AD style DNs)
 		members := entry.GetAttributeValues("memberUid")
@@ -134,7 +151,7 @@ func (c *Client) FetchGroups() ([]models.Group, error) {
 		}
 
 		groups = append(groups, models.Group{
-			Name:    entry.GetAttributeValue("cn"),
+			Name:    name,
 			Passwd:  "x",
 			GID:     gid,
 			Members: members,

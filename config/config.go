@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -68,5 +69,28 @@ func Load(path string) (*Config, error) {
 		cfg.LDAP.BindPassword = envPass
 	}
 
+	if err := cfg.validate(); err != nil {
+		return nil, err
+	}
+
 	return cfg, nil
+}
+
+func (c *Config) validate() error {
+	if c.LDAP.Host == "" {
+		return fmt.Errorf("config: ldap.host is required")
+	}
+	if c.LDAP.BaseDN == "" {
+		return fmt.Errorf("config: ldap.base_dn is required")
+	}
+	if c.LDAP.BindDN == "" {
+		return fmt.Errorf("config: ldap.bind_dn is required")
+	}
+	if c.LDAP.BindPassword == "" {
+		return fmt.Errorf("config: ldap.bind_password is required (set in config or LDAP_BIND_PASSWORD env)")
+	}
+	if c.Cache.TTL <= 0 {
+		return fmt.Errorf("config: cache.ttl must be positive")
+	}
+	return nil
 }

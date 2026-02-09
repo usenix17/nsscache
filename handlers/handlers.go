@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -22,7 +23,9 @@ func New(c *cache.Cache) *Handler {
 // PasswdJSON returns users as JSON
 func (h *Handler) PasswdJSON(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(h.cache.GetUsers())
+	if err := json.NewEncoder(w).Encode(h.cache.GetUsers()); err != nil {
+		log.Printf("error encoding passwd json: %v", err)
+	}
 }
 
 // PasswdFlat returns users in passwd file format
@@ -40,7 +43,9 @@ func (h *Handler) PasswdFlat(w http.ResponseWriter, r *http.Request) {
 // GroupJSON returns groups as JSON
 func (h *Handler) GroupJSON(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(h.cache.GetGroups())
+	if err := json.NewEncoder(w).Encode(h.cache.GetGroups()); err != nil {
+		log.Printf("error encoding group json: %v", err)
+	}
 }
 
 // GroupFlat returns groups in group file format
@@ -77,5 +82,7 @@ func (h *Handler) Health(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		log.Printf("error encoding health json: %v", err)
+	}
 }
