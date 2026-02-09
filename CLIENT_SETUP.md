@@ -39,7 +39,6 @@ Update the passwd and group lines:
 ```
 passwd:         files cache
 group:          files cache
-shadow:         files
 ```
 
 This checks local `/etc/passwd` first, then falls back to the nsscache files.
@@ -49,14 +48,14 @@ This checks local `/etc/passwd` first, then falls back to the nsscache files.
 Add this line **before** `@include common-account`:
 
 ```
-# Allow nsscache users (high UIDs) without shadow entry
+# Allow nsscache users (high UIDs) without local shadow entry
 account sufficient pam_succeed_if.so uid >= 1000000 quiet
 
 # Standard Un*x authorization.
 @include common-account
 ```
 
-**Why:** `pam_unix.so` in common-account checks `/etc/shadow` for password status. Users from nsscache don't exist in shadow, causing "Access denied by PAM account configuration". This rule permits users with UID >= 1000000 (FreeIPA users) without checking shadow.
+**Why:** `pam_unix.so` in common-account checks `/etc/shadow` for password status. Users from nsscache don't have local shadow entries, causing "Access denied by PAM account configuration". This rule permits users with UID >= 1000000 (FreeIPA users) without that check.
 
 ### 4. Auto-create home directories (optional but recommended)
 
